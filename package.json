@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "开发环境启动": "vue-cli-service serve",
+    "测试环境编译": "vue-cli-service build --mode test",
+    "正式环境编译": "vue-cli-service build --mode prod",
+    "测试环境部署": "vue-cli-service build --mode dev && node deploy/dev/index.js",
+    "正式环境部署": "vue-cli-service build --mode prod &&  node deploy/prod/index.js"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -13,6 +16,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
+    "ssh2-sftp-client": "^6.0.0",
     "vue-template-compiler": "^2.6.11"
   },
   "browserslist": [
