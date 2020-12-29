@@ -10,12 +10,19 @@
     "正式环境部署": "vue-cli-service build --mode prod &&  node deploy/prod/index.js"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-router": "^3.4.9",
+    "vuex": "^3.6.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
+    "compression-webpack-plugin": "6",
+    "mockjs": "^1.1.0",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^10.1.0",
     "ssh2-sftp-client": "^6.0.0",
     "vue-template-compiler": "^2.6.11"
   },
