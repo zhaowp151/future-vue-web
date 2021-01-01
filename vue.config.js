@@ -4,13 +4,6 @@ if (process.env.NODE_ENV === 'production') {
   prodEnv = true
 }
 
-const mockServer = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return require('./mock/mockServer.js')
-  } else {
-    return ''
-  }
-}
 
 const path = require('path')
 
@@ -241,9 +234,13 @@ module.exports = {
     hot: true,
     open: true,
     port: '8081',
+    overlay: {
+      warnings: false,
+      errors: true
+    },
     // proxy: {
     //   '/api_wp': {
-    //     target: 'http://192.168.19.226:9020/',
+    //     target: 'http://127.0.0.1:8081/',
     //     pathRewrite: {
     //       '^/api_wp': ''
     //     }
@@ -255,6 +252,6 @@ module.exports = {
     //     }
     //   }
     // },
-    after: mockServer()
+    before: require('./mock/mockServer.js')
   }
 }

@@ -7,10 +7,10 @@ import router from '@/router'
 axios.defaults.timeout = 60000
 
 //axios.defaults.baseURL = window.wp.domianURL // 服务器
-axios.defaults.baseURL = '/api_wp/' // wp
+axios.defaults.baseURL = '/mock-server/' // wp
 
-if (process.env.NODE_ENV === 'production') {
-    axios.defaults.baseURL = 'https://gateway.hyperstrong.net/'
+if (process.env.NODE_ENV === 'prod') {
+    axios.defaults.baseURL = ''
 }
 
 // http request 拦截器

@@ -32,7 +32,11 @@ export default {
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
-    this.$http.get('/get')
+    this.$http.get('/table/getList').then(res =>{
+
+    }).catch(err => {
+      
+    })
   },
   beforeCreate () {}, // 生命周期 - 创建之前
   beforeMount () {}, // 生命周期 - 挂载之前
