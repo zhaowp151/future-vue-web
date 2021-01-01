@@ -1,98 +1,72 @@
 import axios from 'axios'
-import { baseURL, contentType, debounce, requestTimeout, successCode, tokenName } from '@/config'
+// import { baseURL, contentType, debounce, requestTimeout, successCode, tokenName } from '@/config'
 import store from '@/store'
-import qs from 'qs'
 import router from '@/router'
-import { isArray } from '@/util/validate'
-import { ElMessage } from 'element-plus'
+// import { isArray } from '@/util/validate'
 
-let loadingInstance: { close: () => void }
+axios.defaults.timeout = 60000
 
-const handleCode = (code: any, msg: any) => {
-  switch (code) {
-    case 401:
-      ElMessage.error(msg || '登录失效')
-      store.dispatch('user/resetAll').catch(() => {})
-      break
-    case 403:
-      router.push({ path: '/401' }).catch(() => {})
-      break
-    default:
-      ElMessage.error(msg || `后端接口${code}异常`)
-      break
-  }
+//axios.defaults.baseURL = window.wp.domianURL // 服务器
+axios.defaults.baseURL = '/api_wp/' // wp
+
+if (process.env.NODE_ENV === 'production') {
+    axios.defaults.baseURL = 'https://gateway.hyperstrong.net/'
 }
 
-const instance = axios.create({
-  baseURL,
-  timeout: requestTimeout,
-  headers: {
-    'Content-Type': contentType
-  }
-}
-)
+// http request 拦截器
 
-instance.interceptors.request.use(
-  (config) => {
-    if (store.getters['user/accessToken']) { config.headers[tokenName] = store.getters['user/accessToken'] }
-    if (
-      config.data &&
-        config.headers['Content-Type'] ===
-            'application/x-www-form-urlencoded;charset=UTF-8'
-    ) { config.data = qs.stringify(config.data) }
-    if (debounce.some((item: string) => config.url.includes(item))) {
-      // 这里写加载动画
-    }
-    return config
+axios.interceptors.request.use(
+  config => {
+    //   NProgress.start()
+    //   let url = config.url
+    //   url = url.slice(url.lastIndexOf('/') + 1)
+    //   if (url !== 'token') {
+    //       let token = store.getters.getToken
+    //       if (!token) {
+    //           token = sessionStorage.getItem('token')
+    //           store.commit('setToken', token)
+    //       }
+    //       config.headers.Authorization = store.getters.getToken
+    //   }
+    //   // 开发设置
+      if (process.env.NODE_ENV === 'development') {
+          if (config.baseURL === '/api_wp/' && config.url.includes('/ess/')) {
+              config.baseURL = '/api_ess_wp/'
+              config.url = config.url.replace(/\/ess\//, '/')
+              config.headers.uid = 'o1sUPeRMan'
+          }
+          if (config.baseURL === '/api_wp/') {
+              config.url = config.url.replace(/\/u\//, '/')
+              config.headers.uid = 'o1sUPeRMan'
+          }
+      }
+      return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+  err => {
+    //   NProgress.done()
+    //   return Promise.reject(err)
+  })
 
-instance.interceptors.response.use(
-  (response) => {
-    if (loadingInstance) loadingInstance.close()
-
-    const { data, config } = response
-    const { code, msg } = data
-    // 操作正常Code数组
-    const codeVerificationArray = isArray(successCode)
-      ? [...successCode]
-      : [...[successCode]]
-    // 是否操作正常
-    if (codeVerificationArray.includes(code)) {
-      return data
-    } else {
-      handleCode(code, msg)
-      return Promise.reject(
-        JSON.stringify({ url: config.url, code, msg }) || 'Error'
-      )
-    }
+// http response 拦截器
+axios.interceptors.response.use(
+  response => {
+    //   NProgress.done()
+    //   return response
   },
-  (error) => {
-    if (loadingInstance) loadingInstance.close()
-    const { response, message } = error
-    if (error.response && error.response.data) {
-      const { status, data } = response
-      handleCode(status, data.msg || message)
-      return Promise.reject(error)
-    } else {
-      let { message } = error
-      if (message === 'Network Error') {
-        message = '后端接口连接异常'
-      }
-      if (message.includes('timeout')) {
-        message = '后端接口请求超时'
-      }
-      if (message.includes('Request failed with status code')) {
-        const code = message.substr(message.length - 3)
-        message = '后端接口' + code + '异常'
-      }
-      message.error(message || '后端接口未知异常')
-      return Promise.reject(error)
-    }
-  }
-)
+  error => {
+    //   if (error.response) {
+    //       switch (error.response.status) {
+    //           case 401:
+    //               // 401 清除token信息并跳转到登录页面
+    //               store.commit('userLogout')
+    //               router.replace({
+    //                   path: 'login',
+    //                   query: {redirect: router.currentRoute.fullPath}
+    //               })
+    //       }
+    //   }
+    //   NProgress.done()
+    //   return Promise.reject(error)
+  })
 
-export default instance
+export default axios
